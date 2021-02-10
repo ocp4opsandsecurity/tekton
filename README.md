@@ -10,6 +10,7 @@ code.
 - [Components](#components)
 - [Features](#features)  
 - [Installation](#installation)
+- [Concepts](#concepts)  
 - [References](#references)
 
 ## Assumptions
@@ -62,6 +63,19 @@ includes Conditions, Workspaces, Parameters, or Resources depending on the appli
 ```bash
 oc apply -f hello-world/pipeline.yaml
 ```
+
+### PipelineRun
+A PipelineRun instantiates a Pipeline for execution with specific inputs, outputs, and execution parameters on a 
+cluster.
+
+```bash
+oc apply -f hello-world/pipeline-run.yaml
+```
+
+### Workspaces
+Workspaces declare shared storage volumes that a Task in a Pipeline needs at runtime. Instead of specifying the actual 
+location of the volumes, Workspaces enable you to declare the filesystem or parts of the filesystem that would be 
+required at runtime. 
 
 ## References
 - [Tekton On GitHub](https://github.com/tektoncd/pipeline)
