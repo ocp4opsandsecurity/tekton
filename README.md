@@ -36,6 +36,25 @@ Install the OpenShift Red Hat OpenShift Pipelines operator using the following c
 oc apply -f subscription.yaml
 ```
 
+## Concepts
+
+### Tasks
+Tasks are the building blocks and consist of executed Steps. Steps are commands that achieve a specific goal. Every 
+Task runs as a pod and each Step runs in its own container within the same pod.
+
+Apply the `hello-word` **Task** using the following command:
+```bash
+oc apply -f hello-world/task.yaml
+```
+
+### TaskRun
+A TaskRun executes the Steps in a Task in the sequentially, until all Steps execute successfully, or a failure occurs.
+
+Apply the `hello-world` **TaskRun** that executes with the relevant input parameters:
+```bash
+oc apply -f hello-word/task-run.yaml
+```
+
 ## References
 - [Tekton On GitHub](https://github.com/tektoncd/pipeline)
 - [Understanding Openshift Pipelines](https://docs.openshift.com/container-platform/4.6/pipelines/understanding-openshift-pipelines.html?extIdCarryOver=true&sc_cid=701f2000001OH7iAAG)
