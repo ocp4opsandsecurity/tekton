@@ -24,6 +24,10 @@ code.
 - ClusterTasks based on Tekton Catalog 0.16
 
 ## Installation
+Install the OpenShift Red Hat OpenShift Pipelines operator using the following command: 
+```bash
+oc apply -f subscription.yaml
+```
 
 ## References
 - [Tekton On GitHub](https://github.com/tektoncd/pipeline)
