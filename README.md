@@ -55,6 +55,12 @@ Apply the `hello-world` **TaskRun** that executes with the relevant input parame
 oc apply -f hello-word/task-run.yaml
 ```
 
+### Pipelines
+A Pipeline is a collection of Tasks arranged in a specific order of execution. The pipeline definition optionally 
+includes Conditions, Workspaces, Parameters, or Resources depending on the application requirements.
+
+
+
 ## References
 - [Tekton On GitHub](https://github.com/tektoncd/pipeline)
 - [Understanding Openshift Pipelines](https://docs.openshift.com/container-platform/4.6/pipelines/understanding-openshift-pipelines.html?extIdCarryOver=true&sc_cid=701f2000001OH7iAAG)
