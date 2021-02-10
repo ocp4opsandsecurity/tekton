@@ -55,11 +55,13 @@ Apply the `hello-world` **TaskRun** that executes with the relevant input parame
 oc apply -f hello-word/task-run.yaml
 ```
 
-### Pipelines
+### Pipeline
 A Pipeline is a collection of Tasks arranged in a specific order of execution. The pipeline definition optionally 
 includes Conditions, Workspaces, Parameters, or Resources depending on the application requirements.
 
-
+```bash
+oc apply -f hello-world/pipeline.yaml
+```
 
 ## References
 - [Tekton On GitHub](https://github.com/tektoncd/pipeline)
