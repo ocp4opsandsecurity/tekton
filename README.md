@@ -5,8 +5,16 @@ step of the CI/CD pipeline in its own container providing scalable cloud-native 
 OpenShift, pipelines are an automated process that drives software through a path of building, testing, and deploying 
 code.
 
+
+
 ## Table Of Contents
+- [Components](#components)
 - [References](#references)
+
+## Components
+- Tekton Pipelines: v0.16.3
+- Tekton Triggers: v0.8.1
+- ClusterTasks based on Tekton Catalog 0.16
 
 ## References
 - [Tekton On GitHub](https://github.com/tektoncd/pipeline)
