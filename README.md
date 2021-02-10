@@ -1,6 +1,7 @@
-# tekton
+# OpenShift Pipelines
 
-Tekton is an open source project that provides a Kubernetes-native framework to create cloud-native CI/CD pipelines 
-quickly.  By leveraging in Kubernetes, Tekton pipelines are an automated process that drives software through a path 
-of building, testing, and deploying code.
+OpenShift Pipelines is a Kubernetes-style CI/CD solution based on Tekton. OpenShift Pipelines is designed to run each 
+step of the CI/CD pipeline in its own container providing scalable cloud-native CI/CD pipelines. By leveraging in 
+OpenShift,  pipelines are an automated process that drives software through a path of building, testing, and deploying 
+code.
 
