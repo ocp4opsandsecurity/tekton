@@ -8,6 +8,7 @@ code.
 ## Table Of Contents
 - [Assumptions](#assumptions)
 - [Components](#components)
+- [Features](#features)  
 - [Installation](#installation)
 - [References](#references)
 
@@ -22,6 +23,12 @@ code.
 - Tekton Pipelines: v0.16.3
 - Tekton Triggers: v0.8.1
 - ClusterTasks based on Tekton Catalog 0.16
+
+## Features
+- Standardize CI/CD pipelines definitions
+- Build images with Kubernetes tools such as S2I, Buildah, Buildpacks, Kaniko
+- Deploy applications to multiple platforms such as serverless and VMs
+- OpenShift Pipelines are portable across any Kubernetes platforms
 
 ## Installation
 Install the OpenShift Red Hat OpenShift Pipelines operator using the following command: 
