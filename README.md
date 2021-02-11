@@ -50,15 +50,26 @@ The apply-manifests and update-deployment tasks in the pipelines-tutorial Git re
 - OpenShift Pipelines are portable across any Kubernetes platforms
 
 ## Installation
+Export environment variables:
+```bash
+export PIPELINE_PROJECT=<your-pipeline-project>
+```
+
+Create a pipeline project:
+```bash
+oc new-project $PIPELINE_PROJECT
+```
+
+### Apply Subscription
 Install the OpenShift Red Hat OpenShift Pipelines operator using the following command: 
 ```bash
-oc apply -f subscription.yaml
+oc apply -n $PIPELINE_PROJECT -f subscription.yaml
 ```
 
 Red Hat OpenShift Pipelines Operator adds and configures a ServiceAccount named pipeline that has sufficient 
 permissions to build and push an image. This ServiceAccount is used by PipelineRun.
 ```bash
-oc get serviceaccount pipeline
+oc get serviceaccount pipeline -n $PIPELINE_PROJECT
 ```
 
 ## Concepts
@@ -66,19 +77,47 @@ oc get serviceaccount pipeline
 Tasks are the building blocks and consist of executed Steps. Steps are commands that achieve a specific goal. Every 
 Task runs as a pod and each Step runs in its own container within the same pod.
 
-Apply the **Task** using the following command:
+#### Tekton Hub
+Discover, search and share reusable Tasks and Pipelines
+> https://hub-preview.tekton.dev
+
+#### Git Clone Task
+
+Download the `openshift-pipelines` repository:
 ```bash
-oc apply -f hello-world/task.yaml
+tkn task start git-clone \
+    -w=name=output,claimName=ansible-playbooks \
+    -p=url=https://github.com/ocp4opsandsecurity/openshift-pipelines \
+    -p=revision=master \
+    -p=deleteExisting=true \
+    --showlog
+```
+
+#### Ansible Runner Task
+Ansible Runner Task allows running the Ansible Playbooks using the ansible-runner tool.
+- Parameters
+  - project-dir: The ansible-runner private data dir 
+  - args:: The array of arguments to pass to the runner command (default: --help)
+- Workspaces
+  - runner-dir: A workspace to hold the private_data_dir as described in https://ansible-runner.readthedocs.io/en/latest/intro.html#runner-input-directory-hierarchy[Runner Directory]
+
+Apply the **ansible-runner** task using the following command:
+```bash
+oc apply -n $PIPELINE_PROJECT \
+         -f tasks/ansible-runner.yaml
 ```
 
 List the project level **task**:
 ```bash
-tkn task ls
+tkn task ls -n $PIPELINE_PROJECT
 ```
+
+
+
 
 List the cluster level tasks, **clustertask**:
 ```bash
-tkn clustertasks ls
+tkn clustertasks ls -n $PIPELINE_PROJECT
 ```
 
 ### TaskRun
@@ -86,12 +125,12 @@ A TaskRun executes the Steps in a Task in the sequentially, until all Steps exec
 
 Apply the **TaskRun** using the following command:
 ```bash
-oc apply -f hello-word/task-run.yaml
+oc apply -n $PIPELINE_PROJECT -f hello-word/task-run.yaml
 ```
 
 List the **taskrun**:
 ```bash
-tkn taskrun ls
+tkn taskrun ls -n $PIPELINE_PROJECT
 ```
 
 ### Pipeline
@@ -100,30 +139,39 @@ includes Conditions, Workspaces, Parameters, or Resources depending on the appli
 
 Apply the **Pipeline** using the following command:
 ```bash
-oc apply -f hello-world/pipeline.yaml
+oc apply -n $PIPELINE_PROJECT -f hello-world/pipeline.yaml
 ```
 
 List the **pipline**:
 ```bash
-tkn pipeline ls
+tkn pipeline ls -n $PIPELINE_PROJECT
 ```
 
+Execute pipeline:
+```bash
+tkn pipeline start build-and-deploy \
+    -n $PIPELINE_PROJECT \
+    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
+    -p deployment-name=vote-api \
+    -p git-url=https://github.com/openshift-pipelines/vote-api.git \
+    -p IMAGE=image-registry.openshift-image-registry.svc:5000/${PIPELINE_PROJECT}/vote-api
+```
 ### PipelineRun
 A PipelineRun instantiates a Pipeline for execution with specific inputs, outputs, and execution parameters on a 
 cluster.
 
 Apply the **PipelineRun** using the following command:
 ```bash
-oc apply -f hello-world/pipeline-run.yaml
+oc apply -n $PIPELINE_PROJECT -f hello-world/pipeline-run.yaml
 ```
 
 List the **piplinerun**:
 ```bash
-tkn pipelinerun ls
+tkn pipelinerun ls -n $PIPELINE_PROJECT
 ```
 
 ### Workspaces
-Workspaces declare shared storage volumes that a Task in a Pipeline needs at runtime. Instead of specifying the actual 
+Workspaces declare shared storage volumes that a `Task` in a `Pipeline` needs at runtime. Instead of specifying the actual 
 location of the volumes, Workspaces enable you to declare the filesystem or parts of the filesystem that would be 
 required at runtime. 
 
