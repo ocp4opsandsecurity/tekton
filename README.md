@@ -71,9 +71,14 @@ Apply the **Task** using the following command:
 oc apply -f hello-world/task.yaml
 ```
 
-List the tasks created above using the [Tekton CLI](https://github.com/tektoncd/cli/releases):
+List the project level **tasks**:
 ```bash
 tkn task ls
+```
+
+List the cluster level tasks, **clustertasks**:
+```bash
+tkn clustertasks ls
 ```
 
 ### TaskRun
@@ -144,8 +149,10 @@ in the EventListener specification.
 
 ## References
 - [Adding Operators](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-adding-operators-to-cluster.html#olm-adding-operators-to-a-cluster)
+- CLI
+  - [Tekton Tools](https://github.com/tektoncd/cli/releases)
 - GitHub
-  - [OpenShift Pipelines](https://github.com/openshift/pipelines-tutorial/)
-  - [Tekton](https://github.com/tektoncd/pipeline)
+  - [OpenShift Pipelines Repository](https://github.com/openshift/pipelines-tutorial/)
+  - [Tekton Repository](https://github.com/tektoncd/pipeline)
 - [Understanding Openshift Pipelines](https://docs.openshift.com/container-platform/4.6/pipelines/understanding-openshift-pipelines.html?extIdCarryOver=true&sc_cid=701f2000001OH7iAAG)
 
