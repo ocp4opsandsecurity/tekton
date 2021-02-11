@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: hello-taskrun
+spec:
+  serviceAccountName: pipeline
+  taskRef:
+    kind: Task
+    name: hellow-task
+  workspaces:
+    - name: runner-dir
+      persistentVolumeClaim:
+        claimName: shared-workspace
