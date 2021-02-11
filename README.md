@@ -71,12 +71,12 @@ Apply the **Task** using the following command:
 oc apply -f hello-world/task.yaml
 ```
 
-List the project level **tasks**:
+List the project level **task**:
 ```bash
 tkn task ls
 ```
 
-List the cluster level tasks, **clustertasks**:
+List the cluster level tasks, **clustertask**:
 ```bash
 tkn clustertasks ls
 ```
@@ -89,6 +89,11 @@ Apply the **TaskRun** using the following command:
 oc apply -f hello-word/task-run.yaml
 ```
 
+List the **taskrun**:
+```bash
+tkn taskrun ls
+```
+
 ### Pipeline
 A Pipeline is a collection of Tasks arranged in a specific order of execution. The pipeline definition optionally 
 includes Conditions, Workspaces, Parameters, or Resources depending on the application requirements.
@@ -98,6 +103,11 @@ Apply the **Pipeline** using the following command:
 oc apply -f hello-world/pipeline.yaml
 ```
 
+List the **pipline**:
+```bash
+tkn pipeline ls
+```
+
 ### PipelineRun
 A PipelineRun instantiates a Pipeline for execution with specific inputs, outputs, and execution parameters on a 
 cluster.
@@ -105,6 +115,11 @@ cluster.
 Apply the **PipelineRun** using the following command:
 ```bash
 oc apply -f hello-world/pipeline-run.yaml
+```
+
+List the **piplinerun**:
+```bash
+tkn pipelinerun ls
 ```
 
 ### Workspaces
