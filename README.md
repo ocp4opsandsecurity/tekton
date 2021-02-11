@@ -71,6 +71,11 @@ Apply the **Task** using the following command:
 oc apply -f hello-world/task.yaml
 ```
 
+List the tasks created above using the [Tekton CLI](https://github.com/tektoncd/cli/releases):
+```bash
+tkn task ls
+```
+
 ### TaskRun
 A TaskRun executes the Steps in a Task in the sequentially, until all Steps execute successfully, or a failure occurs.
 
