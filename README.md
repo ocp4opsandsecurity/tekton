@@ -123,7 +123,9 @@ includes Conditions, Workspaces, Parameters, or Resources depending on the appli
 
 Apply the **Pipeline** using the following command:
 ```bash
-oc apply -n $PIPELINE_PROJECT -f hello-world/hello-compliance-pipeline.yaml
+oc apply -n $PIPELINE_PROJECT \
+         -f compliance/compliance-pipeline.yaml \
+         -f compliance/compliance-task.yaml
 ```
 
 List the **pipline**:
@@ -134,22 +136,9 @@ tkn pipeline ls -n $PIPELINE_PROJECT
 Execute pipeline:
 ```bash
 tkn pipeline start compliance-pipeline \
-    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
+    -w name=shared-workspace,volumeClaimTemplateFile=compliance/compliance-pvc.yaml \
     -p namespace=pipelines-tutorial \
     --showlog
-```
-### PipelineRun
-A PipelineRun instantiates a Pipeline for execution with specific inputs, outputs, and execution parameters on a 
-cluster.
-
-Apply the **PipelineRun** using the following command:
-```bash
-oc apply -f hello-world/hello-compliance-pipeline-run.yaml
-```
-
-List the **piplinerun**:
-```bash
-tkn pipelinerun ls -n $PIPELINE_PROJECT
 ```
 
 ### Workspaces
