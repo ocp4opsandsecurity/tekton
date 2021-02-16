@@ -6,7 +6,7 @@ spec:
   serviceAccountName: pipeline
   taskRef:
     kind: Task
-    name: hellow-task
+    name: hello-task
   workspaces:
     - name: runner-dir
       persistentVolumeClaim:

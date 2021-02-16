@@ -1,0 +1,29 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: compliance-pipeline
+spec:
+  workspaces:
+  - name: shared-workspace
+  params:
+  - name: namespace
+    type: string
+  tasks:
+  - name: rhcos4-compliance-suite
+    taskRef:
+      name: compliance-suite-task
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    params:
+    - name: namespace
+      value: $(params.namespace)
+    - name: scanProfile
+      value: "xccdf_org.ssgproject.content_profile_moderate"
+    - name: scanContent
+      value: "ssg-rhcos4-ds.xml"
+    - name: scanType
+      value: Node
+    - name: scanName
+      value: moderate
+---

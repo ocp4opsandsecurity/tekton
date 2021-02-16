@@ -1,0 +1,101 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: compliance-suite-task
+spec:
+  params:
+    - description: OpenShift project namespace used to create the compliance-suite
+      name: namespace
+      type: string
+    - description: The name of the compliance suite scan
+      name: scanName
+      type: string
+    - description: The name of the content file
+      name: scanContent
+      type: string
+    - description: The name of the scan profile
+      name: scanProfile
+      type: string
+    - description: The type of scan
+      name: scanType
+      type: string
+    - description: Automatically apply remediations
+      name: autoApplyRemediations
+      type: string
+      default: "false"
+    - description: The scan schedule
+      name: scanSchedule
+      type: string
+      default: '0 1 * * *'
+  steps:
+    - args:
+        - |-
+          echo Create $(inputs.params.scanName) ComplianceSuite
+          oc apply -n $(inputs.params.namespace) -f- <<EOF
+          apiVersion: compliance.openshift.io/v1alpha1
+          kind: ComplianceSuite
+          metadata:
+            name: $(inputs.params.scanName)-compliance-suite
+          spec:
+            autoApplyRemediations: $(inputs.params.autoApplyRemediations)
+            schedule: $(inputs.params.scanSchedule)
+            scans:
+              - name: $(inputs.params.scanName)-scan
+                scanType: $(inputs.params.scanType)
+                profile: $(inputs.params.scanProfile)
+                content: $(inputs.params.scanContent)
+          EOF
+          echo -----------------------------------
+      command:
+        - /bin/bash
+        - -c
+      image: quay.io/openshift/origin-cli:latest
+      name: apply
+      workingDir: /workspace/source
+  workspaces:
+    - name: source
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: compliance-subscription-task
+spec:
+  params:
+    - description: Project namespace
+      name: namespace
+      type: string
+    - description: Operator lifecycle management plan
+      name: installPlanApproval
+      type: string
+      default: "Automatic"
+    - description: Operator subscription channal
+      name: channel
+      type: string
+      default: "4.6"
+  steps:
+    - args:
+        - |-
+          echo Install the Compliance Operator
+          oc apply -f- <<EOF
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: $(inputs.params.namespace)-compliance-subscription
+            namespace: $(inputs.params.namespace)
+          spec:
+            channel: '$(inputs.params.channel)'
+            installPlanApproval: $(inputs.params.installPlanApproval)
+            name: compliance-operator
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+          EOF
+          echo -----------------------------------
+      command:
+        - /bin/bash
+        - -c
+      image: quay.io/openshift/origin-cli:latest
+      name: apply
+      workingDir: /workspace/source
+  workspaces:
+    - name: source
+---

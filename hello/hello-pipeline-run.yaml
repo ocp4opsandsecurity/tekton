@@ -8,6 +8,8 @@ spec:
   params:
     - name: git-url
       value: https://github.com/ocp4opsandsecurity/openshift-pipelines.git
+    - name: git-revision
+      value: "task"
   workspaces:
     - name: shared-workspace
       volumeClaimTemplate:

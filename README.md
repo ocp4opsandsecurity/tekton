@@ -81,48 +81,6 @@ Task runs as a pod and each Step runs in its own container within the same pod.
 Discover, search and share reusable Tasks and Pipelines
 > https://hub-preview.tekton.dev
 
-#### Git Clone Task
-The git-clone Task will clone a repo from the provided url into the output Workspace. By default the repo will be 
-cloned into the root of your Workspace. You can clone into a subdirectory by setting this Task's subdirectory param.
-
-Workspaces
-- output: A workspace for this Task to fetch the git repository in to.
-Parameters
-- url: git url to clone (required)
-- revision: git revision to checkout (branch, tag, sha, ref…) (default: "")
-- refspec: git refspec to fetch before checking out revision (default:"")
-- submodules: defines if the resource should initialize and fetch the submodules (default: true)
-- depth: performs a shallow clone where only the most recent commit(s) will be fetched (default: 1)
-- sslVerify: defines if http.sslVerify should be set to true or false in the global git config (default: true)
-- subdirectory: subdirectory inside the "output" workspace to clone the git repo into (default: "")
-- deleteExisting: clean out the contents of the repo's destination directory if it already exists before cloning the repo there (default: true)
-- httpProxy: git HTTP proxy server for non-SSL requests (default: "")
-- httpsProxy: git HTTPS proxy server for SSL requests (default: "")
-- noProxy: git no proxy - opt out of proxying HTTP/HTTPS requests (default: "")
-- verbose: log the commands that are executed during git-clone's operation (default: true)
-- gitInitImage: the image used where the git-init binary is (default: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.17.3")
-
-Apply the `git-clone` task using the following command:
-```bash
-oc apply -n $PIPELINE_PROJECT \
-         -f tasks/git-clone.yaml
-```
-
-List the project level tasks using the following command:
-```bash
-tkn task ls -n $PIPELINE_PROJECT
-```
-
-Start the `git-clone` task using the following command:
-```bash
-tkn task start git-clone \
-    -n $PIPELINE_PROJECT \
-    -w=name=output,claimName=ansible-playbooks \
-    -p=url=https://github.com/ocp4opsandsecurity/openshift-pipelines \
-    -p=revision=master \
-    -p=deleteExisting=true
-```
-
 #### Ansible Runner Task
 Ansible Runner Task allows running the Ansible Playbooks using the ansible-runner tool.
 - Parameters
@@ -133,16 +91,13 @@ Ansible Runner Task allows running the Ansible Playbooks using the ansible-runne
 
 Apply the **ansible-runner** task using the following command:
 ```bash
-oc apply -n $PIPELINE_PROJECT -f tasks/hello-task.yaml
+oc apply -n $PIPELINE_PROJECT -f hello/hello-compliance-task.yaml
 ```
 
 List the project level **task**:
 ```bash
 tkn task ls -n $PIPELINE_PROJECT
 ```
-
-
-
 
 List the cluster level tasks, **clustertask**:
 ```bash
@@ -154,7 +109,7 @@ A TaskRun executes the Steps in a Task in the sequentially, until all Steps exec
 
 Apply the **TaskRun** using the following command:
 ```bash
-oc apply -n $PIPELINE_PROJECT -f hello-word/hello-task-run.yaml
+oc apply -n $PIPELINE_PROJECT -f hello/hello-compliance-task-run.yaml
 ```
 
 List the **taskrun**:
@@ -168,7 +123,7 @@ includes Conditions, Workspaces, Parameters, or Resources depending on the appli
 
 Apply the **Pipeline** using the following command:
 ```bash
-oc apply -n $PIPELINE_PROJECT -f hello-world/hello-pipeline.yaml
+oc apply -n $PIPELINE_PROJECT -f hello-world/hello-compliance-pipeline.yaml
 ```
 
 List the **pipline**:
@@ -178,12 +133,10 @@ tkn pipeline ls -n $PIPELINE_PROJECT
 
 Execute pipeline:
 ```bash
-tkn pipeline start build-and-deploy \
-    -n $PIPELINE_PROJECT \
+tkn pipeline start compliance-pipeline \
     -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/03_persistent_volume_claim.yaml \
-    -p deployment-name=vote-api \
-    -p git-url=https://github.com/openshift-pipelines/vote-api.git \
-    -p IMAGE=image-registry.openshift-image-registry.svc:5000/${PIPELINE_PROJECT}/vote-api
+    -p namespace=pipelines-tutorial \
+    --showlog
 ```
 ### PipelineRun
 A PipelineRun instantiates a Pipeline for execution with specific inputs, outputs, and execution parameters on a 
@@ -191,7 +144,7 @@ cluster.
 
 Apply the **PipelineRun** using the following command:
 ```bash
-oc apply -n $PIPELINE_PROJECT -f hello-world/hello-pipeline-run.yaml
+oc apply -f hello-world/hello-compliance-pipeline-run.yaml
 ```
 
 List the **piplinerun**:
