@@ -74,8 +74,7 @@ spec:
       default: "4.6"
   steps:
     - image: 'quay.io/openshift/origin-cli:latest'
-      name: 'install compliance operator'
-      resources: {}
+      name: 'install-compliance-operator'
       script: |
         #!/usr/bin/env bash
         if oc get operators.operators.coreos.com  | grep -q "compliance-operator.$(inputs.params.namespace)"
@@ -97,6 +96,9 @@ spec:
         EOF
         echo Installing Compliance Operator
         fi
+      workingDir: /workspace/source
+  workspaces:
+    - name: source
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -118,7 +120,7 @@ spec:
       default: "stable"
   steps:
     - image: 'quay.io/openshift/origin-cli:latest'
-      name: 'install pipeline operator'
+      name: 'install-pipeline-operator'
       resources: {}
       script: |
         #!/usr/bin/env bash
@@ -141,4 +143,7 @@ spec:
         EOF
         echo Installing Compliance Operator
         fi
----=
+      workingDir: /workspace/source
+  workspaces:
+    - name: source
+---
