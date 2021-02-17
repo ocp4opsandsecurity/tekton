@@ -58,8 +58,7 @@ oc new-project $PIPELINE_PROJECT
 ### Apply Subscription
 Install the OpenShift Pipelines operator using the following command: 
 ```bash
-oc apply -n $PIPELINE_PROJECT \
-         -f openshift/pipeline-subscription.yaml
+oc apply -f openshift/subscriptions.yaml
 ```
 
 OpenShift Pipelines Operator adds and configures a ServiceAccount named 
