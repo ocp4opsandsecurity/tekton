@@ -5,23 +5,11 @@ step of the CI/CD pipeline in its own container providing scalable cloud-native 
 OpenShift, pipelines are an automated process that drives software through a path of building, testing, and deploying 
 code.
 
-In this article we will create a full-fledged self-serving CI/CD pipeline performing the following tasks:
+In this article we will be performing the following tasks:
 - Create custom tasks.
-- Create a delivery pipeline.
-- Provide a storage volume
-  - Create a persistent volume claim 
-  - Specify a persistent volume claim
-- Create a PipelineRun 
-
-Add triggers to capture events in the source repository.
-
-This section uses the pipelines-tutorial example to demonstrate the preceding tasks. The example uses a simple application which consists of:
-
-A front-end interface, vote-ui, with the source code in the ui-repo Git repository.
-
-A back-end interface, vote-api, with the source code in the api-repo Git repository.
-
-The apply-manifests and update-deployment tasks in the pipelines-tutorial Git repository.
+- Create custom pipelines.
+- Create storage volumes.
+- Execute PipelineRuns.
 
 ## Table Of Contents
 - [Assumptions](#assumptions)
@@ -42,12 +30,19 @@ The apply-manifests and update-deployment tasks in the pipelines-tutorial Git re
 - Tekton Pipelines: v0.16.3
 - Tekton Triggers: v0.8.1
 - ClusterTasks based on Tekton Catalog 0.16
+- Ansible Runner Task: 0.1
 
+The custom resources needed to define a pipeline are listed below:
+- `Task`: a reusable, loosely coupled number of `Steps`
+- `Pipeline`: the definition of the `Tasks` that it should perform
+- `TaskRun`: the execution and result of running an instance of a `Task`
+- `PipelineRun`: the execution and result of running an instance of a 
+- `Pipeline`: includes a number of `TaskRuns`
+  
 ## Features
-- Standardize CI/CD pipelines definitions
-- Build images with Kubernetes tools such as S2I, Buildah, Buildpacks, Kaniko
-- Deploy applications to multiple platforms such as serverless and VMs
-- OpenShift Pipelines are portable across any Kubernetes platforms
+- Standardize pipelines definitions
+- Build images with Kubernetes tools
+- Deploy applications to multiple platforms
 
 ## Installation
 Export environment variables:
@@ -61,84 +56,65 @@ oc new-project $PIPELINE_PROJECT
 ```
 
 ### Apply Subscription
-Install the OpenShift Red Hat OpenShift Pipelines operator using the following command: 
+Install the OpenShift Pipelines operator using the following command: 
 ```bash
-oc apply -n $PIPELINE_PROJECT -f subscription.yaml
+oc apply -n $PIPELINE_PROJECT \
+         -f openshift/pipeline-subscription.yaml
 ```
 
-Red Hat OpenShift Pipelines Operator adds and configures a ServiceAccount named pipeline that has sufficient 
-permissions to build and push an image. This ServiceAccount is used by PipelineRun.
+OpenShift Pipelines Operator adds and configures a ServiceAccount named 
+pipeline that has sufficient permissions to build and push an image. This 
+ServiceAccount is used by PipelineRun.
 ```bash
 oc get serviceaccount pipeline -n $PIPELINE_PROJECT
 ```
 
 ## Concepts
 ### Tasks
-Tasks are the building blocks and consist of executed Steps. Steps are commands that achieve a specific goal. Every 
-Task runs as a pod and each Step runs in its own container within the same pod.
+Tasks are the building blocks and consist of executed Steps. Steps are commands 
+that achieve a specific goal. Every Task runs as a pod and each Step runs in 
+its own container within the same pod.
 
 #### Tekton Hub
 Discover, search and share reusable Tasks and Pipelines
 > https://hub-preview.tekton.dev
 
-#### Ansible Runner Task
-Ansible Runner Task allows running the Ansible Playbooks using the ansible-runner tool.
-- Parameters
-  - project-dir: The ansible-runner private data dir 
-  - args:: The array of arguments to pass to the runner command (default: --help)
-- Workspaces
-  - runner-dir: A workspace to hold the private_data_dir as described in https://ansible-runner.readthedocs.io/en/latest/intro.html#runner-input-directory-hierarchy[Runner Directory]
+### Pipelines
+A `Pipeline` is a collection of `Tasks` arranged in a specific order of execution.
 
-Apply the **ansible-runner** task using the following command:
+### Compliance Pipeline
+Apply the `Pipeline` and `Task` using the following command:
 ```bash
-oc apply -n $PIPELINE_PROJECT -f hello/hello-compliance-task.yaml
+oc apply -n $PIPELINE_PROJECT \
+         -f compliance/pipeline.yaml \
+         -f compliance/task.yaml
 ```
 
-List the project level **task**:
+List the `Task`:
 ```bash
 tkn task ls -n $PIPELINE_PROJECT
 ```
 
-List the cluster level tasks, **clustertask**:
-```bash
-tkn clustertasks ls -n $PIPELINE_PROJECT
-```
-
-### TaskRun
-A TaskRun executes the Steps in a Task in the sequentially, until all Steps execute successfully, or a failure occurs.
-
-Apply the **TaskRun** using the following command:
-```bash
-oc apply -n $PIPELINE_PROJECT -f hello/hello-compliance-task-run.yaml
-```
-
-List the **taskrun**:
-```bash
-tkn taskrun ls -n $PIPELINE_PROJECT
-```
-
-### Pipeline
-A Pipeline is a collection of Tasks arranged in a specific order of execution. The pipeline definition optionally 
-includes Conditions, Workspaces, Parameters, or Resources depending on the application requirements.
-
-Apply the **Pipeline** using the following command:
-```bash
-oc apply -n $PIPELINE_PROJECT \
-         -f compliance/compliance-pipeline.yaml \
-         -f compliance/compliance-task.yaml
-```
-
-List the **pipline**:
+List the `Pipeline`:
 ```bash
 tkn pipeline ls -n $PIPELINE_PROJECT
 ```
 
-Execute pipeline:
+Execute `Pipeline` using the following command:
 ```bash
 tkn pipeline start compliance-pipeline \
-    -w name=shared-workspace,volumeClaimTemplateFile=compliance/compliance-pvc.yaml \
-    -p namespace=pipelines-tutorial \
+    -w name=shared-workspace,volumeClaimTemplateFile=compliance/pvc.yaml \
+    -p namespace=pipeline.yaml-tutorial \
     --showlog
+```
+
+##### Compliance TaskRun
+A TaskRun executes the `Steps` in a `Task` in the sequentially, until all 
+`Steps` execute successfully, or a failure occurs.
+
+List the `Taskrun` using the following command:
+```bash
+tkn taskrun ls -n $PIPELINE_PROJECT
 ```
 
 ### Workspaces
