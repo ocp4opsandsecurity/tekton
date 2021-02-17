@@ -9,7 +9,7 @@ spec:
   - name: namespace
     type: string
   tasks:
-  - name: rhcos4-compliance-suite
+  - name: moderate-node-compliance-suite
     taskRef:
       name: compliance-suite-task
     workspaces:
@@ -21,9 +21,26 @@ spec:
     - name: scanProfile
       value: "xccdf_org.ssgproject.content_profile_moderate"
     - name: scanContent
-      value: "ssg-rhcos4-ds.xml"
+      value: ssg-rhcos4-ds.xml
     - name: scanType
       value: Node
     - name: scanName
-      value: moderate
+      value: moderate-node
+  - name: moderate-platform-compliance-suite
+    taskRef:
+      name: compliance-suite-task
+    workspaces:
+      - name: source
+        workspace: shared-workspace
+    params:
+      - name: namespace
+        value: $(params.namespace)
+      - name: scanProfile
+        value: "xccdf_org.ssgproject.content_profile_moderate"
+      - name: scanContent
+        value: ssg-ocp4-ds.xml
+      - name: scanType
+        value: Platform
+      - name: scanName
+        value: moderate-platform
 ---
