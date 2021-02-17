@@ -78,7 +78,7 @@ spec:
       resources: {}
       script: |
         #!/usr/bin/env bash
-        if oc get operators.operators.coreos.com  | grep -q "compliance"
+        if oc get operators.operators.coreos.com  | grep -q "compliance-operator.$(inputs.params.namespace)"
           then echo 'compliance operator already  installed'
         else
           echo Install the Compliance Operator
@@ -98,3 +98,47 @@ spec:
         echo Installing Compliance Operator
         fi
 ---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pipeline-subscription-task
+spec:
+  params:
+    - description: Project namespace
+      name: namespace
+      type: string
+      default: openshift-operators
+    - description: Operator lifecycle management plan
+      name: installPlanApproval
+      type: string
+      default: "Automatic"
+    - description: Operator subscription channal
+      name: channel
+      type: string
+      default: "stable"
+  steps:
+    - image: 'quay.io/openshift/origin-cli:latest'
+      name: 'install pipeline operator'
+      resources: {}
+      script: |
+        #!/usr/bin/env bash
+        if oc get operators.operators.coreos.com  | grep -q "openshift-pipelines-operator-rh.$(inputs.params.namespace)"
+          then echo 'compliance operator already  installed'
+        else
+          echo Install the Pipeline Operator
+          oc apply -f- <<EOF
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: openshift-pipelines-operator-rh
+              namespace: $(inputs.params.namespace)
+            spec:
+              channel: '$(inputs.params.channel)'
+              installPlanApproval: $(inputs.params.installPlanApproval)
+              name: openshift-pipelines-operator-rh
+              source: redhat-operators
+              sourceNamespace: openshift-marketplace
+        EOF
+        echo Installing Compliance Operator
+        fi
+---=
