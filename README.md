@@ -106,17 +106,9 @@ List the `Pipeline`:
 tkn pipeline ls -n $NAMESPACE
 ```
 
-Execute the moderate **Node** type `Pipeline` using the following command:
+Execute the moderate `Pipeline` using the following command:
 ```bash
-tkn pipeline start compliance-pipeline-moderate-node \
-    -w name=shared-workspace,volumeClaimTemplateFile=compliance/pvc.yaml \
-    -p namespace=$NAMESPACE \
-    --showlog
-```
-
-Execute the moderate **Platform** type `Pipeline` using the following command:
-```bash
-tkn pipeline start compliance-pipeline-moderate-platform \
+tkn pipeline start moderate-compliance-pipeline \
     -w name=shared-workspace,volumeClaimTemplateFile=compliance/pvc.yaml \
     -p namespace=$NAMESPACE \
     --showlog
