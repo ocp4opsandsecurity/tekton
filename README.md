@@ -47,25 +47,26 @@ The custom resources needed to define a pipeline are listed below:
 ## Installation
 Export environment variables:
 ```bash
-export PIPELINE_PROJECT=<your-pipeline-project>
+export NAMESPACE=<your-pipeline-project>
 ```
 
-Create a pipeline project:
+Create a new pipeline project:
 ```bash
-oc new-project $PIPELINE_PROJECT
+oc new-project $NAMESPACE
 ```
 
 ### Apply Subscription
 Install the OpenShift Pipelines operator using the following command: 
 ```bash
-oc apply -f openshift/subscriptions.yaml
+oc apply -f openshift/subscription.yaml \
+         -l operator=pipelines
 ```
 
 OpenShift Pipelines Operator adds and configures a ServiceAccount named 
-pipeline that has sufficient permissions to build and push an image. This 
-ServiceAccount is used by PipelineRun.
+`Pipeline` that has sufficient permissions to build and push an image. This 
+ServiceAccount is used by `PipelineRun`.
 ```bash
-oc get serviceaccount pipeline -n $PIPELINE_PROJECT
+oc get serviceaccount pipeline -n $NAMESPACE
 ```
 
 ## Concepts
@@ -75,35 +76,49 @@ that achieve a specific goal. Every Task runs as a pod and each Step runs in
 its own container within the same pod.
 
 #### Tekton Hub
-Discover, search and share reusable Tasks and Pipelines
+Discover, search and share reusable Tasks and Pipelines.
 > https://hub-preview.tekton.dev
 
 ### Pipelines
 A `Pipeline` is a collection of `Tasks` arranged in a specific order of execution.
 
-### Compliance Pipeline
+### Compliance Pipeline Example
+Install the OpenShift Compliance operator using the following command:
+```bash
+oc apply -f openshift/subscription.yaml \
+         -l operator=compliance
+```
+
 Apply the `Pipeline` and `Task` using the following command:
 ```bash
-oc apply -n $PIPELINE_PROJECT \
+oc apply -n $NAMESPACE \
          -f compliance/pipeline.yaml \
          -f compliance/task.yaml
 ```
 
 List the `Task`:
 ```bash
-tkn task ls -n $PIPELINE_PROJECT
+tkn task ls -n $NAMESPACE
 ```
 
 List the `Pipeline`:
 ```bash
-tkn pipeline ls -n $PIPELINE_PROJECT
+tkn pipeline ls -n $NAMESPACE
 ```
 
-Execute `Pipeline` using the following command:
+Execute the moderate **Node** type `Pipeline` using the following command:
 ```bash
-tkn pipeline start compliance-pipeline \
+tkn pipeline start compliance-pipeline-moderate-node \
     -w name=shared-workspace,volumeClaimTemplateFile=compliance/pvc.yaml \
-    -p namespace=pipeline.yaml-tutorial \
+    -p namespace=$NAMESPACE \
+    --showlog
+```
+
+Execute the moderate **Platform** type `Pipeline` using the following command:
+```bash
+tkn pipeline start compliance-pipeline-moderate-platform \
+    -w name=shared-workspace,volumeClaimTemplateFile=compliance/pvc.yaml \
+    -p namespace=$NAMESPACE \
     --showlog
 ```
 
@@ -113,13 +128,14 @@ A TaskRun executes the `Steps` in a `Task` in the sequentially, until all
 
 List the `Taskrun` using the following command:
 ```bash
-tkn taskrun ls -n $PIPELINE_PROJECT
+tkn taskrun ls -n $NAMESPACE
 ```
 
 ### Workspaces
-Workspaces declare shared storage volumes that a `Task` in a `Pipeline` needs at runtime. Instead of specifying the actual 
-location of the volumes, Workspaces enable you to declare the filesystem or parts of the filesystem that would be 
-required at runtime. 
+Workspaces declare shared storage volumes that a `Task` in a `Pipeline` needs 
+at runtime. Instead of specifying the actual location of the volumes, 
+Workspaces enable you to declare the filesystem or parts of the filesystem that 
+would be required at runtime. 
 
 - Store Task inputs and outputs
 - Share data among Tasks
@@ -127,34 +143,6 @@ required at runtime.
 - Use it as a mount point for configurations held in ConfigMaps
 - Use it as a mount point for common tools shared by an organization
 - Create a cache of build artifacts that speed up jobs
-
-### Triggers
-Triggers capture the external events and process them to extract key pieces of information.
-
-#### TriggerBinding
-The TriggerBinding resource validates events, extracts the fields from an event payload, and stores them as parameters.
-
-```bash
-oc apply -f trigger-binding.yaml
-```
-
-#### TriggerTemplate
-The TriggerTemplate resource acts as a standard for the way resources must be created. 
-
-```bash
-oc apply -f trigger-template.yaml
-```
-
-#### EventListener
-The EventListener resource provides an endpoint that listens for incoming HTTP-based events with a JSON payload.
-
-```bash
-oc apply -f event-listener.yaml
-```
-
-#### Trigger
-The Trigger resource connects the TriggerBinding and TriggerTemplate resources, and this Trigger resource is referenced 
-in the EventListener specification.
 
 ## References
 - [Adding Operators](https://docs.openshift.com/container-platform/4.6/operators/admin/olm-adding-operators-to-cluster.html#olm-adding-operators-to-a-cluster)

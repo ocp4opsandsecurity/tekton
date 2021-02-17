@@ -3,6 +3,8 @@ kind: Subscription
 metadata:
   name: redhat-openshift-pipelines-operator
   namespace: openshift-operators
+  labels:
+    operator: pipelines
 spec:
   channel: stable
   name: redhat-openshift-pipelines-operator
@@ -14,6 +16,8 @@ kind: Subscription
 metadata:
   name: compliance-operator
   namespace: openshift-operators
+  labels:
+    operator: compliance
 spec:
   channel: '4.6'
   name: compliance-operator
