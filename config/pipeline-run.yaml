@@ -9,9 +9,9 @@ spec:
     - name: deployment-name
       value: vote-api
     - name: git-url
-      value: http://github.com/openshift-pipelines/vote-api.git
+      value: http://github.com/openshift-pipeline.yaml/vote-api.git
     - name: IMAGE
-      value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/vote-api
+      value: image-registry.openshift-image-registry.svc:5000/pipeline.yaml-tutorial/vote-api
   workspaces:
     - name: shared-workspace
       volumeClaimTemplate:
