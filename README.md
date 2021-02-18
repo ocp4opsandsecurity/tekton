@@ -99,6 +99,11 @@ tkn taskrun ls -n $NAMESPACE
 ```
 
 ## Ansible Pipeline Example
+Create `ansible-runner` task:
+```bash
+oc apply -f 
+```
+
 Create the `ansible-deployer` service account:
 ```bash
 oc apply -f- <<EOF
