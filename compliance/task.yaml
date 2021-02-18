@@ -65,7 +65,7 @@ spec:
       type: string
     - name: installPlanApproval
       type: string
-      default: "Automatic"
+      default: "Manual"
     - name: channel
       type: string
     - name: source
@@ -79,7 +79,6 @@ spec:
       name: 'install-operator-step'
       script: |
         #!/usr/bin/env bash
-        echo Install the Compliance Operator
         oc apply -f- <<EOF
           apiVersion: operators.coreos.com/v1alpha1
           kind: Subscription
