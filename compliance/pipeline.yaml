@@ -10,47 +10,9 @@ spec:
     - name: namespace
       type: string
   tasks:
-    - name: compliance-subscription-task
-      taskRef:
-        name: subscription-task
-      workspaces:
-        - name: source
-          workspace: shared-workspace
-      params:
-        - name: namespace
-          value: $(params.namespace)
-        - name: channel
-          value: "4.6"
-        - name: source
-          value: redhat-operators
-        - name: sourceNamespace
-          value: openshift-marketplace
-        - name: name
-          value: compliance-operator
-    - name: pipeline-subscription
-      taskRef:
-        name: subscription-task
-      runAfter:
-        - compliance-subscription-task
-      workspaces:
-        - name: source
-          workspace: shared-workspace
-      params:
-        - name: namespace
-          value: $(params.namespace)
-        - name: channel
-          value: "stable"
-        - name: source
-          value: redhat-operators
-        - name: sourceNamespace
-          value: openshift-marketplace
-        - name: name
-          value: openshift-pipelines-operator-rh
     - name: moderate-platform-compliance-suite
       taskRef:
         name: compliance-suite-task
-      runAfter:
-        - pipeline-subscription
       workspaces:
         - name: source
           workspace: shared-workspace
