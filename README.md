@@ -56,15 +56,9 @@ View the `pipeline` service accounts in the current project:
 oc describe sa pipeline
 ```
 
-Install the OpenShift Compliance operator using the following command:
-```bash
-oc apply -f openshift/subscription.yaml \
-         -l operator=compliance
-```
-
 Apply the `Pipeline` and `Task` using the following command:
 ```bash
-oc apply -n $NAMESPACE -f compliance/task.yaml 
+oc apply -n $NAMESPACE -f https://raw.githubusercontent.com/ocp4opsandsecurity/openshift-pipelines/main/compliance/task.yaml
 ```
 
 List the `Task`:
@@ -74,7 +68,7 @@ tkn task ls -n $NAMESPACE
 
 Apply the `Pipeline` and `Task` using the following command:
 ```bash
-oc apply -n $NAMESPACE -f compliance/pipeline.yaml
+oc apply -n $NAMESPACE -f https://raw.githubusercontent.com/ocp4opsandsecurity/openshift-pipelines/main/compliance/pipeline.yaml
 ```
 
 List the `Pipeline`:
@@ -85,7 +79,7 @@ tkn pipeline ls -n $NAMESPACE
 Execute the moderate `Pipeline` using the following command:
 ```bash
 tkn pipeline start compliance-pipeline \
-    -w name=shared-workspace,volumeClaimTemplateFile=compliance/pvc.yaml \
+    -w name=shared-workspace,volumeClaimTemplateFile=https://raw.githubusercontent.com/ocp4opsandsecurity/openshift-pipelines/main/compliance/pvc.yaml \
     -p namespace=$NAMESPACE \
     --showlog
 ```
@@ -101,13 +95,74 @@ tkn taskrun ls -n $NAMESPACE
 ## Ansible Pipeline Example
 Create `ansible-runner` task:
 ```bash
-oc apply -f 
+oc apply -f- <<EOF
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: ansible-runner
+  namespace: $NAMESPACE
+  labels:
+    app.kubernetes.io/version: '0.1'
+    app.kubernetes.io/ansible-version: '2.9.20'
+    app.kubernetes.io/ansible-k8s-version: '0.11.0'
+  annotations:
+    tekton.dev/pipelines.minVersion: '0.12.1'
+    tekton.dev/tags: cli
+    tekton.dev/displayName: 'Ansible Runner'
+spec:
+  description: >-
+    Task to run Ansible playbooks using Ansible Runner
+
+  workspaces:
+    - name: runner-dir
+      description: The Ansibler runner directory
+  params:
+    - name: project-dir
+      description: The project directory under the workspace runner-dir
+      default: 'project'
+    - name: args
+      description: The arguments to pass ansible-runner
+      type: array
+      default:
+        - --help
+  steps:
+    - name: requirements
+      image: docker.io/ansible/ansible-runner:1.4.6@sha256:bd09ef403f2f90f2c6bd133d7533e939058903f69223c5f12557a49e3aed14bb #tag: 1.4.6
+      script: |
+        #!/bin/bash
+        set -e
+
+        if [ -f requirements.txt ];
+        then
+          pip3 install --user \
+            -r requirements.txt
+        fi
+
+        if [ -f  requirements.yml ];
+        then
+          ansible-galaxy role install -vv \
+            -r requirements.yml
+          ansible-galaxy collection install -vv \
+            -r requirements.yml
+        fi
+      workingDir: '$(workspaces.runner-dir.path)/$(params.project-dir)'
+
+    - name: run-playbook
+      image: docker.io/ansible/ansible-runner:1.4.6@sha256:bd09ef403f2f90f2c6bd133d7533e939058903f69223c5f12557a49e3aed14bb #tag: 1.4.6
+      command: ['entrypoint']
+      args:
+        - ansible-runner
+        - run
+        - $(params.args)
+        - $(params.project-dir)
+      workingDir: '$(workspaces.runner-dir.path)'
+EOF
 ```
 
 Create the `ansible-deployer` service account:
 ```bash
 oc apply -f- <<EOF
----
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -150,7 +205,6 @@ EOF
 Create `ansible-playbooks` Persistent Volume Claim:
 ```bash
 oc apply -f- <<EOF
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -163,7 +217,6 @@ spec:
   resources:
     requests:
       storage: 1Gi
----
 EOF
 ```
 
@@ -174,7 +227,7 @@ tkn clustertask start git-clone \
   --param=url=https://github.com/ocp4opsandsecurity/openshift-pipelines \
   --param=revision=ansible \
   --param=deleteExisting=true \
-  --showlog
+  --showlogs
 ```
 
 
