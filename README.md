@@ -10,6 +10,9 @@ In this article we will be performing the following tasks:
 - Create storage volumes
 - Execute PipelineRuns
 
+Discover, search and share reusable Tasks and Pipelines.
+> https://hub-preview.tekton.dev
+
 ## Assumptions
 - Access to the `oc command`
 - Access to a user with cluster-admin permissions
@@ -47,11 +50,7 @@ Create a new pipeline project:
 oc new-project $NAMESPACE
 ```
 
-### Tekton Hub
-Discover, search and share reusable Tasks and Pipelines.
-> https://hub-preview.tekton.dev
-
-### Compliance Pipeline 
+## Compliance Pipeline 
 View the `pipeline` service accounts in the current project:
 ```bash
 oc describe sa pipeline
@@ -97,6 +96,90 @@ A TaskRun executes the `Steps` in a `Task` in the sequentially, until all
 List the `Taskrun` using the following command:
 ```bash
 tkn taskrun ls -n $NAMESPACE
+```
+
+## Ansible Pipeline Example
+Create the `ansible-deployer` service account:
+```bash
+oc apply -f- <<EOF
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ansible-deployer-account
+  namespace: $NAMESPACE
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ansible-deployer
+rules:
+  # Core API
+  - apiGroups: ['']
+    resources: ['services', 'pods', 'deployments', 'configmaps', 'secrets']
+    verbs: ['get', 'list', 'create', 'update', 'delete', 'patch', 'watch']
+  # Apps API
+  - apiGroups: ['apps']
+    resources: ['deployments', 'daemonsets', 'jobs']
+    verbs: ['get', 'list', 'create', 'update', 'delete', 'patch', 'watch']
+  # Knative API
+  - apiGroups: ['serving.knative.dev']
+    resources: ['services', 'revisions', 'routes']
+    verbs: ['get', 'list', 'create', 'update', 'delete', 'patch', 'watch']
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: ansible-deployer-binding
+subjects:
+  - kind: ServiceAccount
+    name: ansible-deployer-account
+    namespace: $NAMESPACE
+roleRef:
+  kind: ClusterRole
+  name: ansible-deployer
+  apiGroup: rbac.authorization.k8s.io
+EOF
+```
+
+Create `ansible-playbooks` Persistent Volume Claim:
+```bash
+oc apply -f- <<EOF
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ansible-playbooks
+  namespace: $NAMESPACE
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+---
+EOF
+```
+
+Clone Git Repository:
+```bash
+tkn clustertask start git-clone \
+  --workspace=name=output,claimName=ansible-playbooks \
+  --param=url=https://github.com/ocp4opsandsecurity/openshift-pipelines \
+  --param=revision=ansible \
+  --param=deleteExisting=true \
+  --showlog
+```
+
+
+```bash
+ tkn task start ansible-runner \
+   --serviceaccount ansible-deployer-account \
+   --param=project-dir=kubernetes \
+   --param=args='-p ansible/list-pods.yml' \
+   --workspace=name=runner-dir,claimName=ansible-playbooks \
+   --showlog
 ```
 
 ## References
