@@ -1,7 +1,7 @@
 # OpenShift Pipelines
 
 OpenShift Pipelines is a CI/CD solution based on Tekton. By leveraging in 
-OpenShift, pipelines are an automated process that drives software through 
+OpenShift, Tekton pipelines are an automated process that drives software through 
 a path of building, testing, and deploying code.
 
 In this article we will be performing the following tasks:
@@ -90,14 +90,17 @@ oc apply -f openshift/subscription.yaml \
 
 Apply the `Pipeline` and `Task` using the following command:
 ```bash
-oc apply -n $NAMESPACE \
-         -f compliance/pipeline.yaml \
-         -f compliance/task.yaml
+oc apply -n $NAMESPACE -f compliance/task.yaml 
 ```
 
 List the `Task`:
 ```bash
 tkn task ls -n $NAMESPACE
+```
+
+Apply the `Pipeline` and `Task` using the following command:
+```bash
+oc apply -n $NAMESPACE -f compliance/pipeline.yaml
 ```
 
 List the `Pipeline`:
@@ -107,7 +110,7 @@ tkn pipeline ls -n $NAMESPACE
 
 Execute the moderate `Pipeline` using the following command:
 ```bash
-tkn pipeline start moderate-compliance-pipeline \
+tkn pipeline start compliance-pipeline \
     -w name=shared-workspace,volumeClaimTemplateFile=compliance/pvc.yaml \
     -p namespace=$NAMESPACE \
     --showlog

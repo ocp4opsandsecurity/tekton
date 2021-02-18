@@ -58,23 +58,25 @@ spec:
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: compliance-subscription-task
+  name: subscription-task
 spec:
   params:
-    - description: Project namespace
-      name: namespace
+    - name: namespace
       type: string
-    - description: Operator lifecycle management plan
-      name: installPlanApproval
+    - name: installPlanApproval
       type: string
       default: "Automatic"
-    - description: Operator subscription channal
-      name: channel
+    - name: channel
       type: string
-      default: "4.6"
+    - name: source
+      type: string
+    - name: sourceNamespace
+      type: string
+    - name: name
+      type: string
   steps:
     - image: 'quay.io/openshift/origin-cli:latest'
-      name: 'install-compliance-operator'
+      name: 'install-operator-step'
       script: |
         #!/usr/bin/env bash
         echo Install the Compliance Operator
@@ -82,57 +84,14 @@ spec:
           apiVersion: operators.coreos.com/v1alpha1
           kind: Subscription
           metadata:
-            name: $(inputs.params.namespace)-compliance-subscription
+            name: $(inputs.params.name)-subscription
             namespace: $(inputs.params.namespace)
           spec:
             channel: "$(inputs.params.channel)"
             installPlanApproval: $(inputs.params.installPlanApproval)
-            name: compliance-operator
-            source: redhat-operators
-            sourceNamespace: openshift-marketplace
-        EOF
-        echo -----------------------------------
-      workingDir: /workspace/source
-  workspaces:
-    - name: source
----
-apiVersion: tekton.dev/v1beta1
-kind: Task
-metadata:
-  name: pipeline-subscription-task
-spec:
-  params:
-    - description: Project namespace
-      name: namespace
-      type: string
-      default: openshift-operators
-    - description: Operator lifecycle management plan
-      name: installPlanApproval
-      type: string
-      default: "Automatic"
-    - description: Subscription channal
-      name: channel
-      type: string
-      default: "stable"
-  steps:
-    - image: 'quay.io/openshift/origin-cli:latest'
-      name: 'install-pipeline-operator'
-      resources: {}
-      script: |
-        #!/usr/bin/env bash
-        echo Install the Pipeline Operator
-        oc apply -f- <<EOF
-          apiVersion: operators.coreos.com/v1alpha1
-          kind: Subscription
-          metadata:
-            name: openshift-pipelines-operator-rh
-            namespace: $(inputs.params.namespace)
-          spec:
-            channel: "$(inputs.params.channel)"
-            installPlanApproval: $(inputs.params.installPlanApproval)
-            name: openshift-pipelines-operator-rh
-            source: redhat-operators
-            sourceNamespace: openshift-marketplace
+            name: $(inputs.params.name)
+            source: $(inputs.params.source)
+            sourceNamespace: $(inputs.params.sourceNamespace)
         EOF
         echo -----------------------------------
       workingDir: /workspace/source
