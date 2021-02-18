@@ -1,13 +1,12 @@
 # OpenShift Pipelines
 
-OpenShift Pipelines is a Kubernetes-style CI/CD solution based on Tekton. OpenShift Pipelines is designed to run each 
-step of the CI/CD pipeline in its own container providing scalable cloud-native CI/CD pipelines. By leveraging in 
-OpenShift, pipelines are an automated process that drives software through a path of building, testing, and deploying 
-code.
+OpenShift Pipelines is a CI/CD solution based on Tekton. By leveraging in 
+OpenShift, pipelines are an automated process that drives software through 
+a path of building, testing, and deploying code.
 
 In this article we will be performing the following tasks:
 - Create custom tasks.
-- Create custom pipelines.
+- Create a custom pipeline.
 - Create storage volumes.
 - Execute PipelineRuns.
 
@@ -36,7 +35,7 @@ The custom resources needed to define a pipeline are listed below:
 - `Task`: a reusable, loosely coupled number of `Steps`
 - `Pipeline`: the definition of the `Tasks` that it should perform
 - `TaskRun`: the execution and result of running an instance of a `Task`
-- `PipelineRun`: the execution and result of running an instance of a 
+- `PipelineRun`: the execution and result of running an instance of a `Pipeline`
 - `Pipeline`: includes a number of `TaskRuns`
   
 ## Features
