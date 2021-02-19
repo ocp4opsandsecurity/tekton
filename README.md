@@ -121,9 +121,9 @@ spec:
         #!/bin/bash
         set -e
 
-        pip3 install --user -r ./runner-dir/requirements.txt
-        ansible-galaxy role install -vv -r ./runner-dir/requirements.yml
-        ansible-galaxy collection install -vv -r ./runner-dir/requirements.yml
+        pip3 install --user -r requirements.txt
+        ansible-galaxy role install -vv -r requirements.yml
+        ansible-galaxy collection install -vv -r requirements.yml
    
       workingDir: '$(workspaces.runner-dir.path)/$(params.project-dir)'
 
@@ -199,7 +199,7 @@ EOF
 
 Clone Git Repository:
 ```bash
-tkn clustertask start git-clone \
+tkn task start git-clone \
   --workspace=name=output,claimName=ansible-playbooks \
   --param=url=https://github.com/ocp4opsandsecurity/openshift-pipelines \
   --param=revision=ansible \
