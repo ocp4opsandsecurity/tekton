@@ -150,8 +150,7 @@ spec:
       args:
         - ansible-runner
         - run
-        - $(params.args)
-        - $(params.project-dir)
+        - '-p setup.yml'
       workingDir: '$(workspaces.runner-dir.path)'
 EOF
 ```
@@ -226,12 +225,12 @@ tkn clustertask start git-clone \
   --showlog
 ```
 
-
+Execute the `Task`:
 ```bash
 tkn task start ansible-runner \
    --serviceaccount ansible-deployer-account \
    --param=project-dir=project \
-   --param=args='-p setup.yml run ansible' \
+   --param=args='--help' \
    --workspace=name=runner-dir,claimName=ansible-playbooks \
    --showlog
 ```
