@@ -98,14 +98,6 @@ kind: Task
 metadata:
   name: ansible-runner
   namespace: $NAMESPACE
-  labels:
-    app.kubernetes.io/version: '0.1'
-    app.kubernetes.io/ansible-version: '2.9.20'
-    app.kubernetes.io/ansible-k8s-version: '0.11.0'
-  annotations:
-    tekton.dev/pipelines.minVersion: '0.12.1'
-    tekton.dev/tags: cli
-    tekton.dev/displayName: 'Ansible Runner'
 spec:
   description: >-
     Task to run Ansible playbooks using Ansible Runner
@@ -124,33 +116,23 @@ spec:
         - --help
   steps:
     - name: requirements
-      image: quay.io/ansible/ansible-runner:stable-2.10-devel@sha256:5bb1d1e873c93510aa2eae2db003965decd7212d0c42827997021737e07cb989
+      image: quay.io/ansible/ansible-runner:devel@sha256:3b9f43a60c7d4f2c0c07abd3e435b4c575e948c5ffb6cce2d0fba31e3d60f7f1
       script: |
         #!/bin/bash
         set -e
 
-        if [ -f requirements.txt ];
-        then
-          pip3 install --user \
-            -r requirements.txt
-        fi
-
-        if [ -f  requirements.yml ];
-        then
-          ansible-galaxy role install -vv \
-            -r requirements.yml
-          ansible-galaxy collection install -vv \
-            -r requirements.yml
-        fi
+        pip3 install --user -r ./runner-dir/requirements.txt
+        ansible-galaxy role install -vv -r ./runner-dir/requirements.yml
+        ansible-galaxy collection install -vv -r ./runner-dir/requirements.yml
+   
       workingDir: '$(workspaces.runner-dir.path)/$(params.project-dir)'
 
     - name: run-playbook
-      image: quay.io/ansible/ansible-runner:stable-2.10-devel@sha256:5bb1d1e873c93510aa2eae2db003965decd7212d0c42827997021737e07cb989
+      image: quay.io/ansible/ansible-runner:devel@sha256:3b9f43a60c7d4f2c0c07abd3e435b4c575e948c5ffb6cce2d0fba31e3d60f7f1
       script: |
         #!/bin/bash
         set -e
-        ls -R $(workspaces.runner-dir.path)
-        ansible-runner run --playbook setup.yml ./runner-dir/project
+        ansible-runner run --playbook list-pods.yml ./runner-dir/project
       workingDir: '$(workspaces.runner-dir.path)'
 EOF
 ```
