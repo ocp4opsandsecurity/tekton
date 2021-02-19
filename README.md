@@ -124,7 +124,7 @@ spec:
         - --help
   steps:
     - name: requirements
-      image: docker.io/ansible/ansible-runner:1.4.6@sha256:bd09ef403f2f90f2c6bd133d7533e939058903f69223c5f12557a49e3aed14bb #tag: 1.4.6
+      image: quay.io/ansible/ansible-runner:stable-2.10-devel@sha256:5bb1d1e873c93510aa2eae2db003965decd7212d0c42827997021737e07cb989
       script: |
         #!/bin/bash
         set -e
@@ -145,12 +145,12 @@ spec:
       workingDir: '$(workspaces.runner-dir.path)/$(params.project-dir)'
 
     - name: run-playbook
-      image: docker.io/ansible/ansible-runner:1.4.6@sha256:bd09ef403f2f90f2c6bd133d7533e939058903f69223c5f12557a49e3aed14bb #tag: 1.4.6
-      command: ['entrypoint']
-      args:
-        - ansible-runner
-        - run
-        - '-p setup.yml'
+      image: quay.io/ansible/ansible-runner:stable-2.10-devel@sha256:5bb1d1e873c93510aa2eae2db003965decd7212d0c42827997021737e07cb989
+      script: |
+        #!/bin/bash
+        set -e
+        ls -R $(workspaces.runner-dir.path)
+        ansible-runner run --playbook setup.yml ./runner-dir/project
       workingDir: '$(workspaces.runner-dir.path)'
 EOF
 ```
@@ -229,8 +229,7 @@ Execute the `Task`:
 ```bash
 tkn task start ansible-runner \
    --serviceaccount ansible-deployer-account \
-   --param=project-dir=project \
-   --param=args='--help' \
+   --param=args='-p setup.yml' \
    --workspace=name=runner-dir,claimName=ansible-playbooks \
    --showlog
 ```
