@@ -84,9 +84,6 @@ tkn pipeline start compliance-pipeline \
     --showlog
 ```
 
-A TaskRun executes the `Steps` in a `Task` in the sequentially, until all 
-`Steps` execute successfully, or a failure occurs.
-
 List the `Taskrun` using the following command:
 ```bash
 tkn taskrun ls -n $NAMESPACE
@@ -96,7 +93,6 @@ tkn taskrun ls -n $NAMESPACE
 Create `ansible-runner` task:
 ```bash
 oc apply -f- <<EOF
----
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -116,7 +112,7 @@ spec:
 
   workspaces:
     - name: runner-dir
-      description: The Ansibler runner directory
+      description: The Ansible runner directory
   params:
     - name: project-dir
       description: The project directory under the workspace runner-dir
@@ -227,15 +223,15 @@ tkn clustertask start git-clone \
   --param=url=https://github.com/ocp4opsandsecurity/openshift-pipelines \
   --param=revision=ansible \
   --param=deleteExisting=true \
-  --showlogs
+  --showlog
 ```
 
 
 ```bash
- tkn task start ansible-runner \
+tkn task start ansible-runner \
    --serviceaccount ansible-deployer-account \
-   --param=project-dir=kubernetes \
-   --param=args='-p ansible/list-pods.yml' \
+   --param=project-dir=project \
+   --param=args='-p setup.yml run ansible' \
    --workspace=name=runner-dir,claimName=ansible-playbooks \
    --showlog
 ```
