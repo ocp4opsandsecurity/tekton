@@ -24,8 +24,6 @@ Discover, search and share reusable Tasks and Pipelines.
 ## Components
 - Tekton Pipelines: v0.16.3
 - Tekton Triggers: v0.8.1
-- ClusterTasks based on Tekton Catalog 0.16
-- Ansible Runner Task: 0.1
 
 The custom resources needed to define a pipeline are listed below:
 - `Task`: a reusable, loosely coupled number of `Steps`
