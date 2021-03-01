@@ -18,7 +18,6 @@ Discover, search and share reusable Tasks and Pipelines.
 - Access to a user with cluster-admin permissions
 - Access to an installed OpenShift Container Platform 4.6 deployment
 - Access to an active OpenShift Container Platform 4.6 subscription
-- Red Hat Pipeline Operator installed
 - Red Hat Compliance Operator installed
 
 ## Components
@@ -41,6 +40,11 @@ The custom resources needed to define a pipeline are listed below:
 Export environment variables:
 ```bash
 export NAMESPACE=<your-pipeline-project>
+```
+
+Install the pipeline operator if not installed:
+```bash
+oc create -f pipeline-sub.yml
 ```
 
 Create a new pipeline project:
