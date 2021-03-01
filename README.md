@@ -56,12 +56,6 @@ View the `pipeline` service accounts in the current project:
 oc describe sa pipeline
 ```
 
-Install the OpenShift Compliance operator using the following command:
-```bash
-oc apply -f openshift/subscription.yaml \
-         -l operator=compliance
-```
-
 Apply the `Pipeline` and `Task` using the following command:
 ```bash
 oc apply -n $NAMESPACE -f compliance/task.yaml 
