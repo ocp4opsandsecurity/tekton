@@ -1,8 +1,8 @@
 # OpenShift Pipelines
 
-OpenShift Pipelines is a CI/CD solution based on Tekton. By leveraging in 
-OpenShift, Tekton pipelines are an automated process that drives software through 
-a path of building, testing, and deploying code.
+OpenShift Pipelines is a CI/CD solution based on Tekton. Tekton pipelines 
+are an automated process that drives software through a path of building, 
+testing, and deploying code.
 
 In this article we will be performing the following tasks:
 - Create custom tasks
